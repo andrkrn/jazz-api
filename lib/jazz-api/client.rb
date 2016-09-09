@@ -6,6 +6,10 @@ module Jazz
 
     def initialize(api_key = nil)
       @api_key = api_key || Jazz.configuration.api_key
+
+      @default_options = {
+        query: { apikey: @api_key }
+      }
     end
 
     def get(modules, options = {})
@@ -19,10 +23,12 @@ module Jazz
     private
 
     def get_request(url, options)
+      options = @default_options.deep_merge(options)
       self.class.get(url, options)
     end
 
     def post_request(url, options)
+      options = @default_options.deep_merge(options)
       self.class.post(url, options)
     end
   end
