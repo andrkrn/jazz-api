@@ -1,8 +1,10 @@
 module Jazz
   class Client
     include HTTParty
+    format :json
+    debug_output $stdout
 
-    base_uri 'https://api.resumatorapi.com/v1'
+    base_uri 'https://api.resumatorapi.com/v1/'
 
     def initialize(api_key = nil)
       @api_key = api_key || Jazz.configuration.api_key
@@ -12,24 +14,39 @@ module Jazz
       }
     end
 
-    def get(modules, options = {})
-      get_request("/#{modules}", options)
+    def get_records(modules, options = {})
+      args    = options[:args] || {}
+      url     = build_url(modules, args)
+
+      self.class.get("/#{url}", {
+        query: @default_options[:query]
+      })
+    end
+
+    def get_record(modules, id)
+      url = "/#{modules}/#{id}"
+
+      self.class.get(url, {
+        query: @default_options[:query]
+      })
     end
 
     def post(modules, options = {})
-      post_request("/#{modules}", options)
+      options = @default_options.deep_merge(options)
+
+      self.class.post("/#{modules}", options)
     end
 
     private
 
-    def get_request(url, options)
-      options = @default_options.deep_merge(options)
-      self.class.get(url, options)
-    end
+    def build_url(modules, args = {})
+      endpoint = [modules]
 
-    def post_request(url, options)
-      options = @default_options.deep_merge(options)
-      self.class.post(url, options)
+      args.each do |key, value|
+        endpoint << [key, value]
+      end
+
+      endpoint.join('/')
     end
   end
 end

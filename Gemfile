@@ -1,4 +1,7 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in jazz-api.gemspec
+group :development do
+  gem 'pry'
+end
+
 gemspec
